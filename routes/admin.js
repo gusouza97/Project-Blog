@@ -71,7 +71,7 @@ router.post("/categorias/nova", (req, res) => {
 router.get('/categorias/edit/:id', (req, res) => {
     // Fazendo uma busca por um registro
     Categoria.findOne({_id: req.params.id}).then((categoria) => {
-        res.render("admin/editcategorias", {categoria: categoria})
+        res.render("/admin/editcategorias", {categoria: categoria})
     })
     .catch((err) => {
         req.flash("error_msg", "Erro ao editar categoria")
@@ -106,6 +106,17 @@ router.post('/categorias/edit', (req, res) => {
         res.redirect("/admin/categorias")
     })
 
+})
+
+router.post("/categorias/deletar", (req, res) => {
+    Categoria.remove({_id: req.body.id})
+    .then(() => {
+        req.flash("success_msg", "Categoria deletada com sucesso!")
+        res.redirect("/admin/categorias")
+    }).catch((err) => {
+        req.flash("error_msg", "Erro ao remover categoria")
+        res.redirect("/admin/categorias")
+    })
 })
 
 // Exportando o router
