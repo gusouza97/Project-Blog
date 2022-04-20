@@ -2,14 +2,12 @@
 const express = require('express')
 const handlebars = require('express-handlebars')
 const bodyParser = require('body-parser')
-//const mongoose = require('mongoose')
-
 const admin = require('./routes/admin')
+const path = require('path')
+//const mongoose = require('mongoose')
 
 // Definindo a variavel que vai receber o Express
 const app = express();
-
-
 
 // Configuracaoes
 // Body Parser
@@ -31,7 +29,11 @@ app.set('views', './views')
 // Mongoose
 
 
-// Rotas
+// Public
+// Informando o Express que todos os arquivos estaticos estao na pasta Public
+app.use(express.static(path.join(__dirname, 'public')));
+
+// --- Rotas
 
 app.get('/', (req, res) => {
     res.send("Rota Principal")
