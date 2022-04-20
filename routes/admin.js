@@ -1,8 +1,9 @@
-// Chamando o modulo Express
 const express = require("express")
-
-// Funcao armazenada para criarmos rotas em arquivos separados
 const router = express.Router()
+
+const mongoose = require("mongoose")
+require("../models/Categoria")
+const Categoria = mongoose.model("categorias")
 
 // Rotas
 router.get('/', (req, res) => {
@@ -15,6 +16,22 @@ router.get('/posts', (req, res) => {
 
 router.get('/categorias', (req, res) => {
     res.render("admin/categorias")
+})
+
+router.post("/categorias/nova", (req, res) => {
+    const novaCategoria = {
+        nome: req.body.nome,
+        slug: req.body.slug
+    }
+
+    new Categoria(novaCategoria).save()
+    .then(() => {
+        console.log("Categoria cadastrada com sucesso!")
+    })
+    .catch((err) => {
+        console.log("Houve um erro ao registrar no banco de dados")
+    })
+
 })
 
 router.get('/categorias/add', (req, res) => {
