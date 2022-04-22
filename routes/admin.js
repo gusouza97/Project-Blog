@@ -14,10 +14,6 @@ router.get('/', (req, res) => {
     res.render("admin/index")
 })
 
-router.get('/posts', (req, res) => {
-    res.send("Pagina de Posts")
-})
-
 router.get('/categorias', (req, res) => {
     // Trazendo todas as informacoes da collection
     Categoria.find().sort({date: 'desc'})
@@ -75,7 +71,7 @@ router.post("/categorias/nova", (req, res) => {
 router.get('/categorias/edit/:id', (req, res) => {
     // Fazendo uma busca por um registro
     Categoria.findOne({_id: req.params.id}).then((categoria) => {
-        res.render("/admin/editcategorias", {categoria: categoria})
+        res.render("admin/editcategorias", {categoria: categoria})
     })
     .catch((err) => {
         req.flash("error_msg", "Erro ao editar categoria")
@@ -125,6 +121,7 @@ router.post("/categorias/deletar", (req, res) => {
 
 router.get("/postagens", (req, res) => {
 
+    // Utilizando o populate para buscar atributos do model referenciado
     Postagem.find().lean().populate("categoria").sort({data: "desc"}).then((postagens) => {
         res.render("admin/postagens", {postagens: postagens})
     }).catch((err) => {
@@ -170,6 +167,59 @@ router.post("/postagens/nova", (req, res) => {
         })
     }
 
+})
+
+router.get("/postagens/edit/:id", (req, res) => {
+    Postagem.findOne({_id: req.params.id})
+    .then((postagem) => {
+
+        Categoria.find().then((categorias) => {
+            res.render("admin/editpostagens", {postagem: postagem, categorias: categorias})
+        })
+        .catch((err) => {
+            req.flash("error_msg", "Houve um erro ao carregar")
+            res.redirect("admin/postagens")
+        })
+
+    }).catch((err) => {
+        req.flash("error_msg", "Houve um erro ao carregar")
+        res.redirect("admin/postagens")
+    })
+
+})
+
+router.post("/postagens/edit", (req, res) => {
+
+    Postagem.findOne({_id: req.body.id}).then((postagem) => {
+
+        postagem.titulo = req.body.titulo
+        postagem.slug = req.body.slug
+        postagem.descricao = req.body.descricao
+        postagem.conteudo = req.body.conteudo
+        postagem.categoria = req.body.categoria
+
+        postagem.save().then(() => {
+            req.flash("success_msg", "Postagem editada com sucesso!")
+            res.redirect("/admin/postagens")
+        }).catch((err) => {
+            req.flash("error_msg", "Erro interno")
+            res.redirect("/admin/postagens")
+        })
+    }).catch((err) => {
+        req.flash("error_msg", "Houve um erro ao salvar a edicao")
+        res.redirect("admin/postagens")
+    })
+
+})
+
+router.get("/postagens/deletar/:id", (req, res) => {
+    Postagem.remove({_id: req.params.id}).then(() => {
+        req.flash("success_msg", "Postagem deletada com sucesso!")
+        res.redirect("/admin/postagens")
+    }).catch((err) => {
+        req.flash("error_msg", "Houve um error interno")
+        res.redirect("/admin/postagens")
+    })
 })
 
 // Exportando o router

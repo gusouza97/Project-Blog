@@ -8,6 +8,9 @@ const mongoose = require('mongoose')
 const session = require('express-session')
 const flash = require('connect-flash')
 
+require("./models/Postagem")
+const Postagem = mongoose.model("postagens")
+
 // Definindo a variavel que vai receber o Express
 const app = express();
 
@@ -62,7 +65,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ---------------------------------- Rotas ----------------------------------
 
 app.get('/', (req, res) => {
-    res.send("Rota Principal")
+    Postagem.find().lean().populate("categoria").sort({data: "desc"}).then((postagens) => {
+        res.render("index", {postagens: postagens})
+    }).catch((err) => {
+        req.flash("error_msg", "Houve um erro interno")
+        req.redirect("/404")
+    })
+})
+
+app.get("/404", (req, res) => {
+    res.send("Error 404!")
 })
 
 app.get('/posts', (req, res) => {
