@@ -25,7 +25,7 @@ const Postagem = new Schema({
     },
     data: {
         type: Date,
-        default: DateNow()
+        default: Date.now()
     }
 })
 
