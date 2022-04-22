@@ -11,6 +11,9 @@ const flash = require('connect-flash')
 require("./models/Postagem")
 const Postagem = mongoose.model("postagens")
 
+require("./models/Categoria")
+const Categoria = mongoose.model("categorias")
+
 // Definindo a variavel que vai receber o Express
 const app = express();
 
@@ -83,6 +86,38 @@ app.get("/postagem/:slug", (req, res) => {
         }
     }).catch((err) => {
         req.flash("error_msg", "Houve um erro interno " + err )
+        res.redirect("/")
+    })
+})
+
+app.get("/categorias", (req, res) => {
+    Categoria.find().then((categorias) => {
+        res.render("categorias/index", {categorias: categorias})
+    }).catch((err) => {
+        req.flash("error_msg", "Houve um erro interno ao listar categorias")
+        res.redirect("/")
+    })
+})
+
+app.get("/categorias/:slug", (req, res) => {
+    Categoria.findOne({slug: req.params.slug}).then((categoria) => {
+        if(categoria){
+            
+            Postagem.find({categoria: categoria._id}).then((postagens) => {
+
+                res.render("categorias/postagens", {postagens: postagens, categoria: categoria})
+
+            }).catch((err) => {
+                req.flash("error_msg", "Houve um erro ao listar as postagens")
+                res.redirect("/")
+            })
+
+        }else{
+            req.flash("error_msg", "Esta categoria nao existe")
+            res.redirect("/")
+        }
+    }).catch((err) => {
+        req.flash("error_msg", "Houve um erro interno para carregar a pagina desta categoria")
         res.redirect("/")
     })
 })
