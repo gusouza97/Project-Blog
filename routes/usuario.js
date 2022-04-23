@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const bcrypt = require("bcryptjs")
 
 const mongoose = require('mongoose')
 require("../models/Usuario")
@@ -10,8 +11,6 @@ router.get("/registro", (req, res) => {
 })
 
 router.post("/registro", (req, res) => {
-
-    console.log("to aqui")
 
     var erros = []
 
@@ -40,7 +39,46 @@ router.post("/registro", (req, res) => {
         res.render("usuarios/registro", {erros: erros})
 
     }else{
-        // na proxima
+        // Realizando uma verificacao se o email, ja existe em nossa base de dados
+        Usuario.findOne({email: req.body.email}).then((usuario) => {
+            if(usuario){
+                req.flash("error_msg", "Ja existe uma conta com este email")
+                res.redirect("/usuarios/registro")
+            }else{
+
+                const novoUsuario = new Usuario({
+                    nome: req.body.nome,
+                    email: req.body.email,
+                    senha: req.body.senha
+                })
+
+                bcrypt.genSalt(10, (erro, salt) => {
+                    bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
+                        if(erro){
+                            req.flash("error_msg", "Hove um erro durante o salvamento do usuario")
+                            res.redirect("/")
+                        }
+
+                        novoUsuario.senha = hash
+
+                        novoUsuario.save().then(() => {
+                            req.flash("success_msg", "Usuario criado com sucesso")
+                            res.redirect("/")
+                        }).catch((err) => {
+                            req.flash("error_msg", "Houve um erro durante a criacao do usuario")
+                            res.redirect("/usuarios/registro")
+                        })
+                    })
+                })
+
+                
+
+            }
+        }).catch((err) => {
+            req.flash("error_msg", "Houve um erro interno")
+            res.redirect("/")
+        })
+
     }
 })
 
