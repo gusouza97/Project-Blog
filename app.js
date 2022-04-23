@@ -16,6 +16,10 @@ const Postagem = mongoose.model("postagens")
 require("./models/Categoria")
 const Categoria = mongoose.model("categorias")
 
+// Importando o Passport
+const passport = require("passport")
+require("./config/auth")(passport)
+
 // Definindo a variavel que vai receber o Express
 const app = express();
 
@@ -27,6 +31,11 @@ app.use(session({
     resave: true,
     saveUninitialized: true
 }))
+
+// Configurando a sessao do Passport
+app.use(passport.initialize())
+app.use(passport.session())
+
 //Configurando o flash
 app.use(flash())
 
