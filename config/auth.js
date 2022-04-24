@@ -15,7 +15,7 @@ const Usuario = mongoose.model("usuarios")
 
 module.exports = function(passport){
     // Estamos definindo no usernameField a chave da autenticacao... que no caso seria email, username ou outro
-    passport.use(new localStrategy({usernameField: 'email'}, (email, senha, done) => {
+    passport.use(new localStrategy({usernameField: 'email', passwordField: "senha"}, (email, senha, done) => {
 
         // Pesquisando um email igual foi passado na autenticacao
         Usuario.findOne({email: email}).then((usuario) => {
@@ -29,7 +29,7 @@ module.exports = function(passport){
             bcrypt.compare(senha, usuario.senha, (err, equals) => {
                 if(equals){
                     // Declarando a funcao done, passando o usuario
-                    return done(null, user)
+                    return done(null, usuario)
                 }else{
                     return done(null, false, {message: "Senha incorreta"})
                 }
@@ -48,8 +48,8 @@ module.exports = function(passport){
     // Salvando os dados do usuario em uma sessao
     passport.deserializeUser((id, done) => {
         // Procurando um usuario pelo ID dele
-        User.findById(id, (err, usuario) => {
-            done(err, user)
+        Usuario.findById(id, (err, usuario) => {
+            done(err, usuario)
         })
     })
 
