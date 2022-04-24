@@ -45,6 +45,8 @@ app.use((req, res, next) => {
     res.locals.success_msg = req.flash("success_msg")
     res.locals.error_msg = req.flash("error_msg")
     res.locals.error = req.flash("error")
+    // Criando uma variavel global para armazenar o usuario logado, req.user fornecido pelo Passport
+    res.locals.user = req.user || null
     next();
 })
 
