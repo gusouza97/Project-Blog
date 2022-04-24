@@ -100,4 +100,11 @@ router.post("/login", (req, res, next) => {
     })(req, res, next)
 })
 
+router.get("/logout", (req, res) => {
+    // funcao do passport para logout
+    req.logout()
+    req.flash("success_msg", "Deslogado")
+    res.redirect("/")
+})
+
 module.exports = router

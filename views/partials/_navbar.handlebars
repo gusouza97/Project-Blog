@@ -15,7 +15,9 @@
         <!-- User utilizado da variavel global que criamos -->
         {{#if user}}
 
-        <!-- User logado nao aparece nada -->
+        <li class="nav-item">
+          <a class="nav-link" href="/usuarios/logout">Sair</a>
+        </li>
 
         {{else}}
         <li class="nav-item">
@@ -24,6 +26,7 @@
         <li class="nav-item">
           <a class="nav-link" href="/usuarios/registro">Registro</a>
         </li>
+        
         {{/if}}
       </ul>
     </div>
